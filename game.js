@@ -1,5 +1,8 @@
 var game = new Phaser.Game(900, 600, Phaser.AUTO, 'gameDiv');
+
 var gameSpeed = 300;
+var powerupTaken = false;
+var shotsLeft = 0;
 
 var mainState = {
 
@@ -23,6 +26,8 @@ var mainState = {
       this.game.load.image('particleStar', 'assets/particleStar.png');
       this.game.load.image('particleSmallStar', 'assets/particleSmallStar.png');
       this.game.load.image('particleCartoonStar', 'assets/particleCartoonStar.png');
+      this.game.load.image('laserGreen', 'assets/laserGreen.png');
+      this.game.load.image('laserGreenPowerup', 'assets/laserGreenPowerup.png');
 
 
       // game sounds
@@ -32,6 +37,8 @@ var mainState = {
       this.game.load.audio('brickHit', 'assets/brickHit.ogg');
       this.game.load.audio('newBall', 'assets/newBall.ogg');
       this.game.load.audio('ballCrash', 'assets/ballCrash.ogg');
+      this.game.load.audio('powerupArrived', 'assets/powerupArrived.ogg');
+      this.game.load.audio('laserShot', 'assets/laserShot.ogg');
     },
 
     create: function() { 
@@ -71,30 +78,30 @@ var mainState = {
       // bricks
       this.bricks = game.add.group();
       this.bricks.enableBody = true;
-      var brickVelocity = 8;
+      var brickVelocity = 15;
       var newBrick;
       for (var i = 1; i <= 12; i++) {
-        newBrick = this.bricks.create( i * 63, 60, 'greenBlock');
+        newBrick = this.bricks.create( i * 63, 10, 'greenBlock');
         newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        newBrick = this.bricks.create( i * 63, 95, 'purpleBlock');
+        newBrick = this.bricks.create( i * 63, 45, 'purpleBlock');
         newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        newBrick = this.bricks.create( i * 63, 130, 'redBlock');
+        newBrick = this.bricks.create( i * 63, 80, 'redBlock');
         newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        newBrick = this.bricks.create( i * 63, 165, 'yellowBlock');
+        newBrick = this.bricks.create( i * 63, 115, 'yellowBlock');
         newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        newBrick = this.bricks.create( i * 63, 200, 'blueBlock');
+        newBrick = this.bricks.create( i * 63, 150, 'blueBlock');
         newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        newBrick = this.bricks.create( i * 63, 235, 'greyBlock');
+        newBrick = this.bricks.create( i * 63, 185, 'greyBlock');
         newBrick.body.velocity.y = brickVelocity;
       }
 
@@ -114,12 +121,24 @@ var mainState = {
       // ball crash music
       this.ballCrash = game.add.audio('ballCrash');
 
+      // powerup arrived
+      this.powerupArrived = game.add.audio('powerupArrived');
+
+      // laser shot
+      this.laserShot = game.add.audio('laserShot');
+
       // balls
       this.balls = game.add.group();
       this.balls.enableBody = true;
       this.game.physics.arcade.enable(this.balls);
       this.createNewBall();
 
+      // laser
+      this.lasers = game.add.group();
+      this.lasers.enableBody = true;
+      this.game.physics.arcade.enable(this.lasers);
+
+      // particles
       this.starEmitter = game.add.emitter(0, 0, 100);
       this.starEmitter.makeParticles('particleStar');
       this.starEmitter.gravity = 200;
@@ -132,13 +151,12 @@ var mainState = {
       this.starCartoonEmitter.makeParticles('particleCartoonStar');
       this.starCartoonEmitter.gravity = 200;      
 
-
       // keyboard input
       this.cursors = game.input.keyboard.createCursorKeys();
 
       // timer
       this.game.time.events.loop(Phaser.Timer.SECOND, this.updateSpeed, this);
-      this.game.time.events.loop(3000, this.createNewBall, this);
+      this.game.time.events.loop(7000, this.createNewBall, this);
 
     },
 
@@ -152,6 +170,12 @@ var mainState = {
       } else {
         this.paddle.body.velocity.x = 0;
       }
+      if(this.cursors.up.isDown && powerupTaken && shotsLeft != 0) {
+        shotsLeft -= 1;
+        var laser = this.lasers.create(this.paddle.x, this.paddle.y, 'laserGreen');
+        laser.body.velocity.y = -500;
+        this.laserShot.play();
+      }
 
      
       this.game.physics.arcade.collide(this.balls, this.paddle, this.ballHitPaddle, null, this);
@@ -161,18 +185,20 @@ var mainState = {
       this.game.physics.arcade.collide(this.balls, this.vbarRight, this.ballHitRight, null, this);
       this.game.physics.arcade.collide(this.balls, this.bricks, this.ballHitBricks, null, this);
       this.game.physics.arcade.collide(this.hbarBottom, this.bricks, this.brickHitBottom, null, this);
+      this.game.physics.arcade.collide(this.laserGreenPowerup, this.paddle, this.powerUp, null, this);
+      this.game.physics.arcade.collide(this.lasers, this.bricks, this.laserHitBrick, null, this);
      
     },
 
     createNewBall: function(){
-      var randomNum = Math.floor(Math.random() * (850 - 50 + 1)) + 50;
+      var randomNum = Math.floor(Math.random() * (800 - 400 + 1)) + 400;
       var ballType;
       if(randomNum % 2 === 0) {
         ballType = 'ballGrey';
       } else {
         ballType = 'ballBlue';
       }
-      var ball = this.balls.create( randomNum, 300, ballType);
+      var ball = this.balls.create( randomNum, 200, ballType);
       ball.body.velocity.y = gameSpeed;
       ball.anchor.set(0.5);
       ball.body.bounce.set(1);
@@ -243,7 +269,30 @@ var mainState = {
 
       this.brickHit.play();
       brick.kill();
-      gameSpeed += 5;
+      gameSpeed += 2;
+
+      if (this.bricks.countLiving() <= 50 && !powerupTaken) {
+        powerupTaken = true;
+        // powerup
+        this.laserGreenPowerup = this.game.add.sprite(Math.floor(Math.random() * (800 - 400 + 1)) + 400, 0, 'laserGreenPowerup');
+        this.game.physics.arcade.enable(this.laserGreenPowerup);
+        this.laserGreenPowerup.body.velocity.y = 300;
+        this.powerupArrived.play();
+      }
+
+      if (this.bricks.countLiving() === 0) {
+        console.log('You Won');
+      }
+
+    },
+
+    laserHitBrick: function(laser, brick) {
+
+      this.starEmitter.x = brick.body.x;
+      this.starEmitter.y = brick.body.y;
+      this.starEmitter.start(true, 4000, null, 30);
+      laser.kill();
+      brick.kill();
 
       if (this.bricks.countLiving() === 0) {
         console.log('You Won');
@@ -253,6 +302,14 @@ var mainState = {
 
     brickHitBottom: function(bottom, brick) {
       console.log('You lose');
+    },
+
+    powerUp: function() {
+      this.starSmallEmitter.x = this.laserGreenPowerup.body.x;
+      this.starSmallEmitter.y = this.laserGreenPowerup.body.y;
+      this.starSmallEmitter.start(true, 4000, null, 30);
+      this.laserGreenPowerup.kill();
+      shotsLeft = 50;
     },
 
     updateSpeed: function() {
