@@ -22,6 +22,7 @@ var mainState = {
       this.game.load.image('yellowBlock', 'assets/yellowBlock.png');
       this.game.load.image('particleStar', 'assets/particleStar.png');
       this.game.load.image('particleSmallStar', 'assets/particleSmallStar.png');
+      this.game.load.image('particleCartoonStar', 'assets/particleCartoonStar.png');
 
 
       // game sounds
@@ -127,6 +128,10 @@ var mainState = {
       this.starSmallEmitter.makeParticles('particleSmallStar');
       this.starSmallEmitter.gravity = 200;
 
+      this.starCartoonEmitter = game.add.emitter(0, 0, 100);
+      this.starCartoonEmitter.makeParticles('particleCartoonStar');
+      this.starCartoonEmitter.gravity = 200;      
+
 
       // keyboard input
       this.cursors = game.input.keyboard.createCursorKeys();
@@ -207,7 +212,13 @@ var mainState = {
     },
 
     ballHitBottom: function(bottom, ball) {
+
+      this.starCartoonEmitter.x = ball.body.x;
+      this.starCartoonEmitter.y = ball.body.y;
+      this.starCartoonEmitter.start(true, 2000, null, 10);
+      
       this.ballCrash.play();
+      
       ball.kill();
     },
 
