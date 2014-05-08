@@ -14,6 +14,8 @@ var mainState = {
       this.game.load.image('purpleBlock', 'assets/purpleBlock.png');
       this.game.load.image('redBlock', 'assets/redBlock.png');
       this.game.load.image('yellowBlock', 'assets/yellowBlock.png');
+      this.game.load.audio('bgMusic', 'assets/bg.mp3');
+      this.game.load.audio('brickHit', 'assets/brickHit.wav');
     },
 
     create: function() { 
@@ -73,7 +75,15 @@ var mainState = {
       this.ballBlue.body.velocity.y = 300;
       this.ballBlue.anchor.set(0.5);
 
+      // keyboard input
       this.cursors = game.input.keyboard.createCursorKeys();
+
+      // background music
+      this.bgMusic = game.add.audio('bgMusic', 1, true);
+      this.bgMusic.play('', 0, 1, true);
+
+      // hit music
+      this.brickHit = game.add.audio('brickHit');
 
     },
 
@@ -124,6 +134,7 @@ var mainState = {
     },
 
     ballHitBricks: function(ball, brick) {
+      this.brickHit.play();
       if(ball.body.velocity.x >= 0) {
         ball.body.velocity.x = 300;
       } else {
@@ -134,9 +145,8 @@ var mainState = {
       } else {
         ball.body.velocity.y = -300;
       }
-      brick.kill();
+      brick.body.velocity.y = 500;
     }
-    
 };
 
 game.state.add('main', mainState);  
