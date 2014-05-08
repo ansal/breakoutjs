@@ -26,7 +26,7 @@ var mainState = {
 
       // game sounds
 
-      this.game.load.audio('bgMusic', 'assets/bg.mp3');
+      this.game.load.audio('bgMusic', 'assets/bg.ogg');
       this.game.load.audio('paddleHit', 'assets/paddleHit.ogg');
       this.game.load.audio('brickHit', 'assets/brickHit.ogg');
       this.game.load.audio('newBall', 'assets/newBall.ogg');
