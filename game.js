@@ -1,4 +1,5 @@
 var game = new Phaser.Game(700, 500, Phaser.AUTO, 'gameDiv');
+var gameSpeed = 300;
 
 var mainState = {
 
@@ -72,7 +73,7 @@ var mainState = {
       // ball
       this.ballBlue = this.game.add.sprite(700 / 2, 250, 'ballBlue');
       this.game.physics.arcade.enable(this.ballBlue);
-      this.ballBlue.body.velocity.y = 300;
+      this.ballBlue.body.velocity.y = gameSpeed;
       this.ballBlue.anchor.set(0.5);
 
       // keyboard input
@@ -84,6 +85,9 @@ var mainState = {
 
       // hit music
       this.brickHit = game.add.audio('brickHit');
+
+      // timer
+      this.game.time.events.loop(Phaser.Timer.SECOND, this.updateSpeed, this);
 
     },
 
@@ -118,34 +122,39 @@ var mainState = {
       } else {
         this.ballBlue.body.velocity.x = 2 + Math.random() * 8;
       }
-      this.ballBlue.body.velocity.y = -300;
+      this.ballBlue.body.velocity.y = -gameSpeed;
     },
 
     ballHitTop: function() {
-      this.ballBlue.body.velocity.y = 300;
+      this.ballBlue.body.velocity.y = gameSpeed;
     },
 
     ballHitLeft: function() {
-      this.ballBlue.body.velocity.x = 300;
+      this.ballBlue.body.velocity.x = gameSpeed;
     },
 
     ballHitRight: function() {
-      this.ballBlue.body.velocity.x = -300;
+      this.ballBlue.body.velocity.x = -gameSpeed;
     },
 
     ballHitBricks: function(ball, brick) {
       this.brickHit.play();
       if(ball.body.velocity.x >= 0) {
-        ball.body.velocity.x = 300;
+        ball.body.velocity.x = gameSpeed;
       } else {
-        ball.body.velocity.x = -300;
+        ball.body.velocity.x = -gameSpeed;
       }
       if(ball.body.velocity.y >= 0) {
-        ball.body.velocity.y = 300;
+        ball.body.velocity.y = gameSpeed;
       } else {
-        ball.body.velocity.y = -300;
+        ball.body.velocity.y = -gameSpeed;
       }
-      brick.body.velocity.y = 500;
+      brick.kill();
+      gameSpeed += 5;
+    },
+
+    updateSpeed: function() {
+      gameSpeed += 10;
     }
 };
 
