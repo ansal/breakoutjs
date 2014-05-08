@@ -1,4 +1,4 @@
-var game = new Phaser.Game(700, 500, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(900, 600, Phaser.AUTO, 'gameDiv');
 var gameSpeed = 300;
 
 var mainState = {
@@ -25,7 +25,7 @@ var mainState = {
       this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
       // horizontal boundry
-      this.hbarTop = this.game.add.sprite(0, -5, 'hbar');
+      this.hbarTop = this.game.add.sprite(0, 0, 'hbar');
       this.game.physics.arcade.enable(this.hbarTop);
       this.hbarTop.body.immovable = true;
 
@@ -37,12 +37,12 @@ var mainState = {
       this.vbarLeft.body.immovable = true;
 
       // right bar
-      this.vbarRight = this.game.add.sprite(693, 0, 'vbar');
+      this.vbarRight = this.game.add.sprite(890, 0, 'vbar');
       this.game.physics.arcade.enable(this.vbarRight);
       this.vbarRight.body.immovable = true;      
 
       // paddle
-      this.paddle = this.game.add.sprite(700 / 2 - 80, 450, 'paddle');
+      this.paddle = this.game.add.sprite(900 / 2 - 80, 575, 'paddle');
       this.game.physics.arcade.enable(this.paddle);
       this.paddle.body.collideWorldBounds = true;
       this.paddle.body.immovable = true;
@@ -51,22 +51,22 @@ var mainState = {
       // bricks
       this.bricks = game.add.group();
       this.bricks.enableBody= true;
-      for (var i = 1; i <= 9; i++) {
+      for (var i = 1; i <= 12; i++) {
         this.bricks.create( i * 63, 50, 'blueBlock');
       }
-      for (i = 1; i <= 9; i++) {
+      for (i = 1; i <= 12; i++) {
         this.bricks.create( i * 63, 85, 'greenBlock');
       }
-      for (i = 1; i <= 9; i++) {
+      for (i = 1; i <= 12; i++) {
         this.bricks.create( i * 63, 120, 'greyBlock');
       }
-      for (i = 1; i <= 9; i++) {
+      for (i = 1; i <= 12; i++) {
         this.bricks.create( i * 63, 155, 'purpleBlock');
       }
-      for (i = 1; i <= 9; i++) {
+      for (i = 1; i <= 12; i++) {
         this.bricks.create( i * 63, 190, 'redBlock');
       }
-      for (i = 1; i <= 9; i++) {
+      for (i = 1; i <= 12; i++) {
         this.bricks.create( i * 63, 225, 'yellowBlock');
       }
 
