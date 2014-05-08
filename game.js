@@ -7,6 +7,7 @@ var mainState = {
 
       this.game.load.image('paddle', 'assets/paddle.png');
       this.game.load.image('ballBlue', 'assets/ballBlue.png');
+      this.game.load.image('ballGrey', 'assets/ballGrey.png');
       this.game.load.image('hbar', 'assets/hbar.png');
       this.game.load.image('vbar', 'assets/vbar.png');
       this.game.load.image('blueBlock', 'assets/blueBlock.png');
@@ -16,7 +17,8 @@ var mainState = {
       this.game.load.image('redBlock', 'assets/redBlock.png');
       this.game.load.image('yellowBlock', 'assets/yellowBlock.png');
       this.game.load.audio('bgMusic', 'assets/bg.mp3');
-      this.game.load.audio('brickHit', 'assets/brickHit.wav');
+      this.game.load.audio('brickHit', 'assets/brickHit.ogg');
+      this.game.load.audio('newBall', 'assets/newBall.ogg');
     },
 
     create: function() { 
@@ -50,34 +52,33 @@ var mainState = {
 
       // bricks
       this.bricks = game.add.group();
-      this.bricks.enableBody= true;
+      this.bricks.enableBody = true;
+      var brickVelocity = 10;
+      var newBrick;
       for (var i = 1; i <= 12; i++) {
-        this.bricks.create( i * 63, 50, 'blueBlock');
+        newBrick = this.bricks.create( i * 63, 60, 'greenBlock');
+        newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        this.bricks.create( i * 63, 85, 'greenBlock');
+        newBrick = this.bricks.create( i * 63, 95, 'purpleBlock');
+        newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        this.bricks.create( i * 63, 120, 'greyBlock');
+        newBrick = this.bricks.create( i * 63, 130, 'redBlock');
+        newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        this.bricks.create( i * 63, 155, 'purpleBlock');
+        newBrick = this.bricks.create( i * 63, 165, 'yellowBlock');
+        newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        this.bricks.create( i * 63, 190, 'redBlock');
+        newBrick = this.bricks.create( i * 63, 200, 'blueBlock');
+        newBrick.body.velocity.y = brickVelocity;
       }
       for (i = 1; i <= 12; i++) {
-        this.bricks.create( i * 63, 225, 'yellowBlock');
+        newBrick = this.bricks.create( i * 63, 235, 'greyBlock');
+        newBrick.body.velocity.y = brickVelocity;
       }
-
-      // ball
-      this.ballBlue = this.game.add.sprite(700 / 2, 250, 'ballBlue');
-      this.game.physics.arcade.enable(this.ballBlue);
-      this.ballBlue.body.velocity.y = gameSpeed;
-      this.ballBlue.anchor.set(0.5);
-
-      // keyboard input
-      this.cursors = game.input.keyboard.createCursorKeys();
 
       // background music
       this.bgMusic = game.add.audio('bgMusic', 1, true);
@@ -86,8 +87,22 @@ var mainState = {
       // hit music
       this.brickHit = game.add.audio('brickHit');
 
+      // new ball music
+      this.newBall = game.add.audio('newBall');
+
+      // balls
+      this.balls = game.add.group();
+      this.balls.enableBody = true;
+      this.game.physics.arcade.enable(this.balls);
+      this.createNewBall();
+
+
+      // keyboard input
+      this.cursors = game.input.keyboard.createCursorKeys();
+
       // timer
       this.game.time.events.loop(Phaser.Timer.SECOND, this.updateSpeed, this);
+      this.game.time.events.loop(3000, this.createNewBall, this);
 
     },
 
@@ -102,43 +117,50 @@ var mainState = {
         this.paddle.body.velocity.x = 0;
       }
 
-      // collisions
-      this.game.physics.arcade.collide(this.ballBlue, this.paddle, this.ballHitPaddle, null, this);
-      this.game.physics.arcade.collide(this.ballBlue, this.hbarTop, this.ballHitTop, null, this);
-      this.game.physics.arcade.collide(this.ballBlue, this.vbarLeft, this.ballHitLeft, null, this);
-      this.game.physics.arcade.collide(this.ballBlue, this.vbarRight, this.ballHitRight, null, this);
-      this.game.physics.arcade.collide(this.ballBlue, this.bricks, this.ballHitBricks, null, this);
-
+     
+      this.game.physics.arcade.collide(this.balls, this.paddle, this.ballHitPaddle, null, this);
+      this.game.physics.arcade.collide(this.balls, this.hbarTop, this.ballHitTop, null, this);
+      this.game.physics.arcade.collide(this.balls, this.vbarLeft, this.ballHitLeft, null, this);
+      this.game.physics.arcade.collide(this.balls, this.vbarRight, this.ballHitRight, null, this);
+      this.game.physics.arcade.collide(this.balls, this.bricks, this.ballHitBricks, null, this);
+     
     },
 
-    ballHitPaddle: function() {
+    createNewBall: function(){
+      var ball = this.balls.create( Math.floor(Math.random() * (850 - 50 + 1)) + 50, 300, 'ballGrey');
+      ball.body.velocity.y = gameSpeed;
+      ball.anchor.set(0.5);
+      ball.body.bounce.set(1);
+      this.newBall.play();
+    },
 
-      if(this.ballBlue.x < this.paddle.x) {
-        var diff = this.paddle.x - this.ballBlue.x;
-        this.ballBlue.body.velocity.x = -10 * diff;
-      } else if(this.ballBlue.x > this.paddle.x) {
-        var diff = this.ballBlue.x - this.paddle.x;
-        this.ballBlue.body.velocity.x = 10 * diff;
+    ballHitPaddle: function(ball, paddle) {
+
+      if(ball.x < paddle.x) {
+        var diff = paddle.x - ball.x;
+        ball.body.velocity.x = -10 * diff;
+      } else if(ball.x > paddle.x) {
+        var diff = ball.x - paddle.x;
+        ball.body.velocity.x = 10 * diff;
       } else {
-        this.ballBlue.body.velocity.x = 2 + Math.random() * 8;
+        ball.body.velocity.x = 2 + Math.random() * 8;
       }
-      this.ballBlue.body.velocity.y = -gameSpeed;
     },
 
-    ballHitTop: function() {
-      this.ballBlue.body.velocity.y = gameSpeed;
+    ballHitTop: function(top, ball) {
+      ball.body.velocity.y = gameSpeed;
     },
 
-    ballHitLeft: function() {
-      this.ballBlue.body.velocity.x = gameSpeed;
+    ballHitLeft: function(left, ball) {
+      ball.body.velocity.x = gameSpeed;
     },
 
-    ballHitRight: function() {
-      this.ballBlue.body.velocity.x = -gameSpeed;
+    ballHitRight: function(right, ball) {
+      ball.body.velocity.x = -gameSpeed;
     },
 
     ballHitBricks: function(ball, brick) {
-      this.brickHit.play();
+      
       if(ball.body.velocity.x >= 0) {
         ball.body.velocity.x = gameSpeed;
       } else {
@@ -149,12 +171,17 @@ var mainState = {
       } else {
         ball.body.velocity.y = -gameSpeed;
       }
+
+      ball.body.velocity.y = -gameSpeed;
+
+      this.brickHit.play();
       brick.kill();
-      gameSpeed += 5;
+      gameSpeed += 2;
+
     },
 
     updateSpeed: function() {
-      gameSpeed += 10;
+      gameSpeed += 4;
     }
 };
 
