@@ -8,6 +8,12 @@ var mainState = {
       this.game.load.image('ballBlue', 'assets/ballBlue.png');
       this.game.load.image('hbar', 'assets/hbar.png');
       this.game.load.image('vbar', 'assets/vbar.png');
+      this.game.load.image('blueBlock', 'assets/blueBlock.png');
+      this.game.load.image('greenBlock', 'assets/greenBlock.png');
+      this.game.load.image('greyBlock', 'assets/greyBlock.png');
+      this.game.load.image('purpleBlock', 'assets/purpleBlock.png');
+      this.game.load.image('redBlock', 'assets/redBlock.png');
+      this.game.load.image('yellowBlock', 'assets/yellowBlock.png');
     },
 
     create: function() { 
@@ -39,8 +45,30 @@ var mainState = {
       this.paddle.body.immovable = true;
       this.paddle.anchor.setTo(0.5, 0.5);
 
+      // bricks
+      this.bricks = game.add.group();
+      this.bricks.enableBody= true;
+      for (var i = 1; i <= 9; i++) {
+        this.bricks.create( i * 63, 50, 'blueBlock');
+      }
+      for (i = 1; i <= 9; i++) {
+        this.bricks.create( i * 63, 85, 'greenBlock');
+      }
+      for (i = 1; i <= 9; i++) {
+        this.bricks.create( i * 63, 120, 'greyBlock');
+      }
+      for (i = 1; i <= 9; i++) {
+        this.bricks.create( i * 63, 155, 'purpleBlock');
+      }
+      for (i = 1; i <= 9; i++) {
+        this.bricks.create( i * 63, 190, 'redBlock');
+      }
+      for (i = 1; i <= 9; i++) {
+        this.bricks.create( i * 63, 225, 'yellowBlock');
+      }
+
       // ball
-      this.ballBlue = this.game.add.sprite(700 / 2, 50, 'ballBlue');
+      this.ballBlue = this.game.add.sprite(700 / 2, 250, 'ballBlue');
       this.game.physics.arcade.enable(this.ballBlue);
       this.ballBlue.body.velocity.y = 300;
       this.ballBlue.anchor.set(0.5);
@@ -65,6 +93,7 @@ var mainState = {
       this.game.physics.arcade.collide(this.ballBlue, this.hbarTop, this.ballHitTop, null, this);
       this.game.physics.arcade.collide(this.ballBlue, this.vbarLeft, this.ballHitLeft, null, this);
       this.game.physics.arcade.collide(this.ballBlue, this.vbarRight, this.ballHitRight, null, this);
+      this.game.physics.arcade.collide(this.ballBlue, this.bricks, this.ballHitBricks, null, this);
 
     },
 
@@ -92,6 +121,20 @@ var mainState = {
 
     ballHitRight: function() {
       this.ballBlue.body.velocity.x = -300;
+    },
+
+    ballHitBricks: function(ball, brick) {
+      if(ball.body.velocity.x >= 0) {
+        ball.body.velocity.x = 300;
+      } else {
+        ball.body.velocity.x = -300;
+      }
+      if(ball.body.velocity.y >= 0) {
+        ball.body.velocity.y = 300;
+      } else {
+        ball.body.velocity.y = -300;
+      }
+      brick.kill();
     }
     
 };
