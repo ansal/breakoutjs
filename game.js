@@ -1,6 +1,5 @@
 var game = new Phaser.Game(900, 600, Phaser.AUTO, 'gameDiv');
 
-var footerText;
 var gameSpeed = 300;
 var powerupTaken = false;
 var shotsLeft = 0;
@@ -19,7 +18,7 @@ var mainState = {
       var headingText = this.game.add.text(x, y-50, "Loading... Please wait...", headingStyle);
       headingText.anchor.setTo(0.5, 0.5);
 
-      footerText = this.game.add.text(x, y + 70, "Built with <3 in Banjarapalya", footerStyle);
+      var footerText = this.game.add.text(x, y + 70, "Built with <3 in Banjarapalya", footerStyle);
       footerText.anchor.setTo(0.5, 0.5);
 
 
@@ -310,13 +309,13 @@ var mainState = {
       brick.kill();
 
       if (this.bricks.countLiving() === 0) {
-        console.log('You Won');
+        game.state.start('won');
       }
 
     },
 
     brickHitBottom: function(bottom, brick) {
-      console.log('You lose');
+      game.state.start('failed');
     },
 
     powerUp: function() {
@@ -328,11 +327,65 @@ var mainState = {
     },
 
     updateSpeed: function() {
-      //gameSpeed += 6;
+      gameSpeed += 6;
     }
 };
 
+var wonState = {
+
+  create: function() {
+
+    var headingStyle = { font: "30px Arial", fill: "#ffffff" };
+    var footerStyle = { font: "14px Arial", fill: "#ffffff" };
+
+    var x = game.world.width/2;
+    var y = game.world.height/2;
+        
+    this.headingText = this.game.add.text(x, y-50, "You Won!!! Congrats!!!", headingStyle);
+    this.headingText.anchor.setTo(0.5, 0.5);
+
+    this.footerText = this.game.add.text(x, y + 70, "Built with <3 in Banjarapalya", footerStyle);
+    this.footerText.anchor.setTo(0.5, 0.5);
+
+  },
+
+  update: function() {
+
+    this.footerText.angle += 2;
+
+  }
+
+};
+
+var failedState = {
+
+  create: function() {
+
+    var headingStyle = { font: "30px Arial", fill: "#ffffff" };
+    var footerStyle = { font: "14px Arial", fill: "#ffffff" };
+
+    var x = game.world.width/2;
+    var y = game.world.height/2;
+        
+    this.headingText = this.game.add.text(x, y-50, "Game Over!!! Sorry!!!", headingStyle);
+    this.headingText.anchor.setTo(0.5, 0.5);
+
+    this.footerText = this.game.add.text(x, y + 70, "Built with <3 in Banjarapalya", footerStyle);
+    this.footerText.anchor.setTo(0.5, 0.5);
+
+  },
+
+  update: function() {
+
+    this.footerText.angle += 2;
+
+  }
+
+};
+
 // states  
-game.state.add('main', mainState);  
+game.state.add('main', mainState);
+game.state.add('failed', failedState);
+game.state.add('won', wonState);
 
 game.state.start('main');
