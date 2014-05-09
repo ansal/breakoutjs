@@ -92,7 +92,7 @@ var mainState = {
       // bricks
       this.bricks = game.add.group();
       this.bricks.enableBody = true;
-      var brickVelocity = 0;
+      var brickVelocity = 15;
       var newBrick;
       for (var i = 1; i <= 12; i++) {
         newBrick = this.bricks.create( i * 63, 10, 'greenBlock');
