@@ -1,12 +1,36 @@
 var game = new Phaser.Game(900, 600, Phaser.AUTO, 'gameDiv');
 
-var gameSpeed = 300;
-var powerupTaken = false;
-var shotsLeft = 0;
+var footerText;
 
-var mainState = {
+var preloadState = {
 
-    preload: function() { 
+  create: function() {
+
+    var headingStyle = { font: "30px Arial", fill: "#ffffff" };
+    var footerStyle = { font: "14px Arial", fill: "#ffffff" };
+
+    var x = game.world.width/2;
+    var y = game.world.height/2;
+        
+    var headingText = this.game.add.text(x, y-50, "Loading... Please wait...", headingStyle);
+    headingText.anchor.setTo(0.5, 0.5);
+
+    footerText = this.game.add.text(x, y + 70, "Built with <3 in Banjarapalya", footerStyle);
+    footerText.anchor.setTo(0.5, 0.5);    
+
+  },
+
+  update: function() {
+
+    footerText.angle += 2;
+
+  }
+
+};
+
+var loadState = {
+
+  preload: function() { 
 
       // game graphics
 
@@ -39,7 +63,19 @@ var mainState = {
       this.game.load.audio('ballCrash', 'assets/ballCrash.ogg');
       this.game.load.audio('powerupArrived', 'assets/powerupArrived.ogg');
       this.game.load.audio('laserShot', 'assets/laserShot.ogg');
-    },
+    }
+
+};
+
+var menuState = {
+
+};
+
+var gameSpeed = 300;
+var powerupTaken = false;
+var shotsLeft = 0;
+
+var mainState = {
 
     create: function() { 
 
@@ -106,7 +142,7 @@ var mainState = {
       }
 
       // background music
-      this.bgMusic = game.add.audio('bgMusic', 0.2, true);
+      this.bgMusic = game.add.audio('bgMusic', 0.1, true);
       this.bgMusic.play();
 
       // paddle hit music
@@ -317,5 +353,10 @@ var mainState = {
     }
 };
 
+// states
+game.state.add('preload', preloadState);
+game.state.add('load', loadState);  
+game.state.add('menu', menuState);  
 game.state.add('main', mainState);  
-game.state.start('main');
+
+game.state.start('preload');
