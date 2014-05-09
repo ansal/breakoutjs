@@ -347,12 +347,23 @@ var wonState = {
     this.footerText = this.game.add.text(x, y + 70, "Built with <3 in Banjarapalya", footerStyle);
     this.footerText.anchor.setTo(0.5, 0.5);
 
+    this.helpText = this.game.add.text(x, y + 200, "PRESS SPACE TO RESTART", footerStyle);
+    this.helpText.anchor.setTo(0.5, 0.5);
+
+
+    var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    spaceKey.onDown.add(this.start, this);
+
   },
 
   update: function() {
 
     this.footerText.angle += 2;
 
+  },
+
+  start: function() {
+    window.location.reload();
   }
 
 };
@@ -373,12 +384,23 @@ var failedState = {
     this.footerText = this.game.add.text(x, y + 70, "Built with <3 in Banjarapalya", footerStyle);
     this.footerText.anchor.setTo(0.5, 0.5);
 
+    this.helpText = this.game.add.text(x, y + 200, "PRESS SPACE TO RESTART", footerStyle);
+    this.helpText.anchor.setTo(0.5, 0.5);
+
+
+    var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+    spaceKey.onDown.add(this.start, this); 
+
   },
 
   update: function() {
 
     this.footerText.angle += 2;
 
+  },
+
+  start: function() {
+    window.location.reload();
   }
 
 };
