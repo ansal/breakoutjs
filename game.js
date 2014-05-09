@@ -92,7 +92,7 @@ var mainState = {
       // bricks
       this.bricks = game.add.group();
       this.bricks.enableBody = true;
-      var brickVelocity = 15;
+      var brickVelocity = 0;
       var newBrick;
       for (var i = 1; i <= 12; i++) {
         newBrick = this.bricks.create( i * 63, 10, 'greenBlock');
@@ -295,7 +295,7 @@ var mainState = {
       }
 
       if (this.bricks.countLiving() === 0) {
-        console.log('You Won');
+        game.state.start('won');
       }
 
     },
